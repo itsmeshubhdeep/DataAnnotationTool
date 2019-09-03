@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html ng-app="plunker">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Data Annotation Tool</title>
+	<script>document.write('<base href="' + document.location + '" />');</script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<!-- <script data-require="jquery@*" data-semver="2.1.1" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	<script data-require="angular.js@1.2.x" src="https://code.angularjs.org/1.2.25/angular.js" data-semver="1.2.25"></script>
+</head>
+
+<body ng-controller="MainCtrl">
+
+	<!-- <div>{{fileContent}}</div> -->
+	<div class="container">
+		<h2>Data Annotation Tool</h2>
+
+		<input type="file" file-reader="fileContent" />
+		<hr>
+		<div class="panel panel-default" style="max-height:500px; overflow-x:auto; border:none">
+			<div class="panel panel-default" ng-repeat="x in fileContent">
+				<div class="panel-heading">{{$index + 1}}. {{x.companyName}}</div>
+				<div class="panel-body">
+					<label class="checkbox-inline" ng-repeat="y in x.options track by $index">
+						<input type="checkbox" value="y.optionName" data-ng-model="y.isSelected"> {{y.optionName}}
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default" ng-if="fileContent">
+				<div class="panel-footer">
+					<button ng-click="getData(fileContent)">Get Data</button>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		var app = angular.module('plunker', []);
+		app.controller('MainCtrl', function ($scope) {
+			$scope.getData = function (data) {
+				var dataToPrint = []
+				data.forEach(element => {
+					var newOpts = [];
+					
+					element.options.forEach((opt, key) => {
+						if (opt.isSelected) {
+							newOpts.push(opt.optionName);
+						}
+					})
+					// model: item.model.replace(/,/g, ''), // remove commas to avoid errors,
+					dataToPrint.push({ 
+						companyName: element.companyName,
+						options: newOpts
+					});
+				})
+				var headers = {
+					companyName: "Company Name",
+					options: "Selected Options",
+				};
+				var fileTitle = 'new file'; // or 'my-unique-title'
+				exportCSVFile(headers, dataToPrint, fileTitle);
+			}
+
+
+			function exportCSVFile(headers, items, fileTitle) {
+				if (headers) {
+					items.unshift(headers);
+				}
+
+				// Convert Object to JSON
+				var jsonObject = JSON.stringify(items);
+
+				var csv = convertToCSV(jsonObject);
+
+				var exportedFilename = fileTitle + '.csv' || 'export.csv';
+
+				var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+				if (navigator.msSaveBlob) { // IE 10+
+					navigator.msSaveBlob(blob, exportedFilename);
+				} else {
+					var link = document.createElement("a");
+					if (link.download !== undefined) { // feature detection
+						// Browsers that support HTML5 download attribute
+						var url = URL.createObjectURL(blob);
+						link.setAttribute("href", url);
+						link.setAttribute("download", exportedFilename);
+						link.style.visibility = 'hidden';
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+					}
+				}
+			}
+
+			function convertToCSV(objArray) {
+				var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+				var str = '';
+
+				for (var i = 0; i < array.length; i++) {
+					var line = '';
+					for (var index in array[i]) {
+						if (line != '') line += ','
+
+						line += array[i][index];
+					}
+
+					str += line + '\r\n';
+				}
+
+				return str;
+			}
+
+
+		}); //controller end line
+
+		app.directive('fileReader', function () {
+			return {
+				scope: {
+					fileReader: "="
+				},
+				link: function (scope, element) {
+					$(element).on('change', function (changeEvent) {
+						var files = changeEvent.target.files;
+
+						if (files.length) {
+							var r = new FileReader();
+							r.onload = function (e) {
+								var contents = e.target.result;
+								var dataArray = e.target.result.split("\n");
+								var finalArray = [];
+								dataArray.forEach(element => {
+									finalArray.push({
+										companyName: element, options: [
+											{ optionName: "Blue collar", isSelected: false },
+											{ optionName: "Grey collar", isSelected: false },
+											{ optionName: "White collar", isSelected: false },
+											{ optionName: "IT services", isSelected: false },
+											{ optionName: "Software products", isSelected: false },
+											{ optionName: "Engineering", isSelected: false },
+											{ optionName: "Healthcare", isSelected: false },
+											{ optionName: "Manufacturing", isSelected: false },
+											{ optionName: "Banking / Financial services", isSelected: false },
+											{ optionName: "BPO", isSelected: false },
+											{ optionName: "Legal", isSelected: false },
+											{ optionName: "FMCG", isSelected: false },
+											{ optionName: "Telecommunication", isSelected: false },
+											{ optionName: "Logistics and transportation", isSelected: false },
+											{ optionName: "Marketing and Sales", isSelected: false },
+											{ optionName: "AI / Data science", isSelected: false },
+											{ optionName: "Other emerging fields", isSelected: false }
+										]
+									})
+								});
+								finalArray.pop();
+								scope.$apply(function () {
+									scope.fileReader = finalArray;
+								});
+							};
+
+							r.readAsText(files[0]);
+						}
+					});
+				}
+			};
+		});
+
+	</script>
+</body>
+
+</html>
