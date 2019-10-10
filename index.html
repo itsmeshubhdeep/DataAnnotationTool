@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title>AngularJS Plunker</title>
+	<title>Data Annotation Tool</title>
 	<script>document.write('<base href="' + document.location + '" />');</script>
 	<link rel="stylesheet" href="bootstrap.min.css">
 	<script src="jquery.min.js"></script>
@@ -17,6 +17,13 @@
 	<!-- <div>{{fileContent}}</div> -->
 	<div class="container" style="background:#dde6dfe8">
 		<h2>Data Annotation Tool</h2>
+
+		<label>Select Input Data</label>
+		<select id="selectedInputDataType" ng-model="inputDataType" ng-change="onInputDataTypeChange()">
+			<option value="jobs">Jobs</option>
+		    <option value="skills">Skills</option>
+		</select>
+		
 
 		<h3><input type="file" class="hidden" id="loadData" file-reader="fileContent"  />
 			<label class="label label-info" for="loadData">Load data</label>
@@ -34,7 +41,7 @@
 						<br>
 
 						<div class="well well-lg">
-							<label class="checkbox-inline" ng-repeat="y in fileContent[currentIndex].options track by $index">
+							<label class="checkbox-inline" ng-repeat="y in fileContent[currentIndex].options track by $index" style="margin-left: 10px">
 								<input type="checkbox" value="y.optionName" data-ng-model="y.isSelected"> {{y.optionName}}
 							</label>
 						</div>

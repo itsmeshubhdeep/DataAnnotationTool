@@ -1,5 +1,6 @@
 var app = angular.module('plunker', []);
 app.controller('MainCtrl', function ($scope) {
+  $scope.inputDataType = "jobs";
   $scope.getData = function (data) {
     var dataToPrint = []
     data.forEach(element => {
@@ -39,6 +40,10 @@ app.controller('MainCtrl', function ($scope) {
     }
   };
 
+  $scope.onInputDataTypeChange = function(){
+    document.getElementById('loadData').value = '';
+  }
+
 
   function exportCSVFile(headers, items, fileTitle) {
     if (headers) {
@@ -50,18 +55,18 @@ app.controller('MainCtrl', function ($scope) {
 
     var csv = convertToCSV(jsonObject);
 
-    var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+    var exportedFilename = fileTitle + '.csv' || 'export.csv';
 
     var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     if (navigator.msSaveBlob) { // IE 10+
-      navigator.msSaveBlob(blob, exportedFilenmae);
+      navigator.msSaveBlob(blob, exportedFilename);
     } else {
       var link = document.createElement("a");
       if (link.download !== undefined) { // feature detection
         // Browsers that support HTML5 download attribute
         var url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", exportedFilenmae);
+        link.setAttribute("download", exportedFilename);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -94,7 +99,7 @@ app.controller('MainCtrl', function ($scope) {
 app.directive('fileReader', function () {
   return {
     scope: {
-      fileReader: "="
+      fileReader: "=",
     },
     link: function (scope, element) {
       $(element).on('change', function (changeEvent) {
@@ -105,30 +110,51 @@ app.directive('fileReader', function () {
           r.onload = function (e) {
             var contents = e.target.result;
             var dataArray = JSON.parse(process(contents));
+            var selectedInputDataType = document.getElementById('selectedInputDataType').value;
 
             // var dataArray = e.target.result.split("\n");
-            var finalArray = [];
-
+            var finalArray = [];            
+            
             dataArray.forEach(element => {
-              element.options = [
-                { optionName: "Blue collar", isSelected: false },
-                { optionName: "Grey collar", isSelected: false },
-                { optionName: "White collar", isSelected: false },
-                { optionName: "IT services", isSelected: false },
-                { optionName: "Software products", isSelected: false },
-                { optionName: "Engineering", isSelected: false },
-                { optionName: "Healthcare", isSelected: false },
-                { optionName: "Manufacturing", isSelected: false },
-                { optionName: "Banking / Financial services", isSelected: false },
-                { optionName: "BPO", isSelected: false },
-                { optionName: "Legal", isSelected: false },
-                { optionName: "FMCG", isSelected: false },
-                { optionName: "Telecommunication", isSelected: false },
-                { optionName: "Logistics and transportation", isSelected: false },
-                { optionName: "Marketing and Sales", isSelected: false },
-                { optionName: "AI / Data science", isSelected: false },
-                { optionName: "Other emerging fields", isSelected: false }
-              ]
+              if (selectedInputDataType === 'jobs') {
+                element.options = [
+                  { optionName: "Blue collar", isSelected: false },
+                  { optionName: "Grey collar", isSelected: false },
+                  { optionName: "White collar", isSelected: false },
+                  { optionName: "IT services", isSelected: false },
+                  { optionName: "Software products", isSelected: false },
+                  { optionName: "Engineering", isSelected: false },
+                  { optionName: "Healthcare", isSelected: false },
+                  { optionName: "Manufacturing", isSelected: false },
+                  { optionName: "Banking / Financial services", isSelected: false },
+                  { optionName: "BPO", isSelected: false },
+                  { optionName: "Legal", isSelected: false },
+                  { optionName: "FMCG", isSelected: false },
+                  { optionName: "Telecommunication", isSelected: false },
+                  { optionName: "Logistics and transportation", isSelected: false },
+                  { optionName: "Marketing and Sales", isSelected: false },
+                  { optionName: "AI / Data science", isSelected: false },
+                  { optionName: "Other emerging fields", isSelected: false }
+                ]
+              } else if (selectedInputDataType === 'skills') {
+                element.options = [
+                  { optionName: "AI/Data science", isSelected: false },
+                  { optionName: "Aptitude ", isSelected: false },
+                  { optionName: "Banking/Financial services ", isSelected: false },
+                  { optionName: "Business development ", isSelected: false },
+                  { optionName: "Cognitive abilities ", isSelected: false },
+                  { optionName: "Engineering", isSelected: false },
+                  { optionName: "IT - Advanced Technologies", isSelected: false },
+                  { optionName: "IT - Computer Sciences", isSelected: false },
+                  { optionName: "IT - Enterprise Tools ", isSelected: false },
+                  { optionName: "IT - Languages/Frameworks", isSelected: false },
+                  { optionName: "IT - Mobile App Development", isSelected: false },
+                  { optionName: "IT - Testing & QA", isSelected: false },
+                  { optionName: "IT - Web development", isSelected: false },
+                  { optionName: "Puzzles", isSelected: false }
+                ]
+              }
+
 
               // finalArray.push({
               //   title: element.title, 
